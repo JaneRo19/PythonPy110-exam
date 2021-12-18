@@ -1,5 +1,6 @@
 import random
 import json
+from itertools import count
 from faker import Faker
 from typing import Iterator
 from conf import MODEL
@@ -15,27 +16,34 @@ def main():
      """
 
     python_object = []
-    for _ in range(10):
-        python_object.append(next(book_generator()))
+    pk = get_pk()
+    for _ in range(100):
+        python_object.append(next(book_generator(pk)))
     print(python_object)
 
-    with open("book_generated.json", "w", encoding="utf-8") as f_output:
+    with open("books_generated.json", "w", encoding="utf-8") as f_output:
         json.dump(python_object, f_output, indent=4, ensure_ascii=False)
 
 
-
-def book_generator(pk=1) -> Iterator:
+def book_generator(pk) -> Iterator:
     """Функция генератор книг
 
     аргумент pk - автоинкремент, который увеличивается на 1 при генерации нового объекта
     формирует словарь книг в соответсвии с примером
 
     """
+    pk = next(pk)
     keys = ["model", "pk", "fields"]
     values = [MODEL, pk, get_fields()]
-    while True:
-        yield dict(zip(keys, values))
-        pk += 1
+    yield dict(zip(keys, values))
+
+
+def get_pk() -> int:
+    """Функция получения pk
+
+    """
+    for current_number in count(1):
+        yield current_number
 
 
 def get_fields() -> dict:
